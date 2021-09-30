@@ -48,16 +48,15 @@ RC值越大滤波越明显（平滑），但是输出幅值会下降，相位越
 class RC_LowPassFilter
 {
 private:
-    double _dt = 0.01;
     double _last_output = 0;
-    double _filter_coeff = 0.2;
     double _rcPart = 0;
 
 public:
     RC_LowPassFilter() = default;
     ~RC_LowPassFilter() = default;
-    double filter(double raw_input, double dt);
+    double filter(double raw_input, double dt, double filter_coeff);
 };
+
 
 ```
 
@@ -65,14 +64,14 @@ public:
 //RC_LowPassFilter.cpp
 #include "RC_LowPassFilter.h"
 
-double RC_LowPassFilter::filter(double raw_input, double dt)
+double RC_LowPassFilter::filter(double raw_input, double dt, double filter_coeff)
 {
-
+    double d_out = raw_input - _last_output;
+    _rcPart = filter_coeff * d_out / dt;
     double output = raw_input - _rcPart;
-    double d_out = output - _last_output;
-    _rcPart = _filter_coeff * d_out / _dt;
     _last_output = output;
     return output;
 }
 ```
 
+**发现filter_coeff不能超过某个限值，否则会发散。。。**
